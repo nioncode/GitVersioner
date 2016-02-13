@@ -24,7 +24,7 @@ class Version:
     def __repr__(self):
         return "%s(%r)" % (self.__class__, self.__dict__)
 
-    def semantic_version(self):
+    def semantic_version(self, dirty_suffix='dirty'):
         s = "{}.{}.{}".format(self.major, self.minor, self.patch)
         if self.pre_release_id:
             s += '-' + self.pre_release_id
@@ -33,7 +33,7 @@ class Version:
         if self.hash:
             s += '.' + self.hash
         if self.is_dirty:
-            s += '.dirty'
+            s += '.' + dirty_suffix
         return s
 
     @classmethod
@@ -88,4 +88,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     version = Version.parse_from(args.version_string)
     print('Major: {}\nMinor: {}\nPatch: {}\nSemVer: {}'.format(version.major, version.minor, version.patch,
-                                                               version.semantic_version()))
+                                                               version.semantic_version(dirty_suffix='dev')))
