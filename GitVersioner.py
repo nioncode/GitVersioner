@@ -28,12 +28,17 @@ class Version:
         s = "{}.{}.{}".format(self.major, self.minor, self.patch)
         if self.pre_release_id:
             s += '-' + self.pre_release_id
+
+        metadata = []
         if self.commits_since:
-            s += '+' + str(self.commits_since)
+            metadata.append(str(self.commits_since))
         if self.hash:
-            s += '.' + self.hash
+            metadata.append(self.hash)
         if self.is_dirty:
-            s += '.' + dirty_suffix
+            metadata.append(dirty_suffix)
+        if len(metadata) > 0:
+            s += '+' + '.'.join(metadata)
+
         return s
 
     @classmethod

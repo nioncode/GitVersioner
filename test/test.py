@@ -54,5 +54,24 @@ class ParsingTestCase(unittest.TestCase):
                           Version.parse_from("v1.2.3-alpha.3-12-g296cf8b-dirty"))
 
 
+class SemanticVersionTestCase(unittest.TestCase):
+    def test_consists_of_major_minor_patch(self):
+        self.assertEquals("1.2.0", Version(1, 2).semantic_version())
+        self.assertEquals("1.2.3", Version(1, 2, 3).semantic_version())
+
+    def test_pre_releases(self):
+        self.assertEquals("1.2.3-alpha.3-special", Version(1, 2, 3, "alpha.3-special").semantic_version())
+
+    def test_metadata_dirty(self):
+        self.assertEquals("1.2.0+dirty", Version(1, 2, is_dirty=True).semantic_version())
+
+    def test_metadata_dirty_customizable(self):
+        self.assertEquals("1.2.0+dev", Version(1, 2, is_dirty=True).semantic_version('dev'))
+
+    def test_metadata_multiple(self):
+        self.assertEquals("1.2.3-alpha.3-special+12.296cf8b.dirty",
+                          Version(1, 2, 3, "alpha.3-special", "296cf8b", 12, True).semantic_version())
+
+
 if __name__ == '__main__':
     unittest.main()
