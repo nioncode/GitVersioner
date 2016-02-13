@@ -110,16 +110,16 @@ def version_as_preprocessor_macros(v, prefix, dirty_suffix):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Splits a version string into individual components.")
     parser.add_argument('version_string', type=str, help='Version string to parse.')
+    parser.add_argument('-d', '--dirty-suffix', type=str, default='dirty',
+                        help='Suffix to use when the build version is dirty')
     macros = parser.add_argument_group('Macros', 'C preprocessor options')
     macros.add_argument('-m', '--macros', action='store_true', help='Output C preprocessor style macros')
     macros.add_argument('-p', '--prefix', type=str, default='', help='Prefix to add before each preprocessor variable')
-    macros.add_argument('-d', '--dirty-suffix', type=str, default='dirty',
-                        help='Suffix to use when the build version is dirty')
 
     args = parser.parse_args()
     version = Version.parse_from(args.version_string)
     if args.macros:
         print(version_as_preprocessor_macros(version, args.prefix, args.dirty_suffix))
     else:
-        print('Major: {}\nMinor: {}\nPatch: {}\nSemVer: {}'.format(version.major, version.minor, version.patch,
-                                                                   version.semantic_version(dirty_suffix='dev')))
+        ver = version.semantic_version(dirty_suffix=args.dirty_suffix)
+        print('Major: {}\nMinor: {}\nPatch: {}\nSemVer: {}'.format(version.major, version.minor, version.patch, ver))
