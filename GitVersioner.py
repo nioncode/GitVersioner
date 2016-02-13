@@ -1,12 +1,14 @@
 #!/bin/env python
 import argparse
+import re
 
 
 class Version:
-    def __init__(self, major, minor, patch=0, commit_hash=None, commits_since=0 , is_dirty=False):
+    def __init__(self, major, minor, patch=0, pre_release_id=None, commit_hash=None, commits_since=0, is_dirty=False):
         self.major = major
         self.minor = minor
         self.patch = patch
+        self.pre_release_id = pre_release_id
         self.hash = commit_hash
         self.commits_since = commits_since
         self.is_dirty = is_dirty
@@ -24,6 +26,8 @@ class Version:
 
     def semantic_version(self):
         s = "{}.{}.{}".format(self.major, self.minor, self.patch)
+        if self.pre_release_id:
+            s += '-' + self.pre_release_id
         if self.commits_since:
             s += '+' + str(self.commits_since)
         if self.hash:
@@ -44,43 +48,38 @@ class Version:
             raise ValueError("version_string must be a non-empty string")
 
         parts = version_string.split('-')
-
         is_dirty = parts[-1] == 'dirty'
         if is_dirty:
             parts = parts[:-1]
+        if '.' not in parts[0]:
+            # Without a tag, the version string only consists of the SHA1 hash of the commit and the dirty flag.
+            return Version(0, 0, commit_hash=parts[0], is_dirty=is_dirty)
 
-        major = 0
-        minor = 0
-        patch = 0
+        tag = parts.pop(0).lstrip('v')
+        version_codes = tag.split('.')
+        major = int(version_codes[0])
+        minor = int(version_codes[1])
+        patch = int(version_codes[2]) if len(version_codes) == 3 else 0
+        if len(parts) == 0:
+            return Version(major, minor, patch, is_dirty=is_dirty)
+
         commits_since = 0
         commit_hash = None
+        if re.match('g[a-f0-9]+', parts[-1]):
+            # The last component matches a g'sha1', assume this our commit hash.
+            # Git adds a 'g' prefix to the hash, which must be removed.
+            commit_hash = parts[-1][1:]
+            # If we have a commit hash, there must also be a commits_since component.
+            commits_since = int(parts[-2])
+            parts = parts[:-2]
+            if len(parts) == 0:
+                return Version(major, minor, patch, commit_hash=commit_hash, commits_since=commits_since,
+                               is_dirty=is_dirty)
 
-        has_tag = '.' in parts[0]
-        if has_tag:
-            # We have a valid tag.
-            tag = parts.pop(0).lstrip('v')
-            version_codes = tag.split('.')
-            major = int(version_codes[0])
-            minor = int(version_codes[1])
-            patch = int(version_codes[2]) if len(version_codes) == 3 else 0
+        # All remaining parts are build identifiers.
+        pre_release_id = '-'.join(parts)
 
-            try:
-                commits_since = int(parts[0])
-                parts.pop(0)
-            except (IndexError, ValueError):
-                # There are no commits since.
-                pass
-
-        try:
-            commit_hash = parts.pop(0)
-            if has_tag:
-                # Git prefixes the SHA1 hash with a 'g', but only if it follows a tag.
-                commit_hash = commit_hash[1:]
-        except IndexError:
-            # There is no hash left.
-            pass
-
-        return Version(major, minor, patch, commit_hash, commits_since, is_dirty)
+        return Version(major, minor, patch, pre_release_id, commit_hash, commits_since, is_dirty)
 
 
 if __name__ == '__main__':
