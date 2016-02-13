@@ -1,6 +1,6 @@
 #!/bin/env python
 import unittest
-from GitVersioner import Version
+from GitVersioner import Version, version_as_preprocessor_macros
 
 
 class ParsingTestCase(unittest.TestCase):
@@ -71,6 +71,16 @@ class SemanticVersionTestCase(unittest.TestCase):
     def test_metadata_multiple(self):
         self.assertEquals("1.2.3-alpha.3-special+12.296cf8b.dirty",
                           Version(1, 2, 3, "alpha.3-special", "296cf8b", 12, True).semantic_version())
+
+
+class FormatterTestCase(unittest.TestCase):
+    def test_as_preprocessor_macros(self):
+        v = Version(4, 6, 1, "alpha.3-special", "296cf8b", 12, True)
+        self.assertEquals(('#define SOME_MAJOR 4\n'
+                           '#define SOME_MINOR 6\n'
+                           '#define SOME_PATCH 1\n'
+                           '#define SOME_SEM_VER \"{}\"'
+                           ).format(v.semantic_version('dev')), version_as_preprocessor_macros(v, 'SOME_', 'dev'))
 
 
 if __name__ == '__main__':
