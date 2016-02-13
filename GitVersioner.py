@@ -42,12 +42,13 @@ class Version:
         return s
 
     @classmethod
-    def parse_from(cls, version_string: str):
+    def parse_from(cls, version_string):
         """
         Splits a version string (retrieved e.g. by calling `git describe --tags --dirty --always`) into different parts.
 
         :param version_string: The version string.
         :return: Version object
+        :type version_string: str
         """
         if not version_string:
             raise ValueError("version_string must be a non-empty string")
@@ -87,7 +88,18 @@ class Version:
         return Version(major, minor, patch, pre_release_id, commit_hash, commits_since, is_dirty)
 
 
-def version_as_preprocessor_macros(v: Version, prefix: str, dirty_suffix: str):
+def version_as_preprocessor_macros(v, prefix, dirty_suffix):
+    """
+    Creates a C preprocessor style string from a Version.
+
+    :param v: The Version to convert.
+    :param prefix: A prefix to be added before each preprocessor variable.
+    :param dirty_suffix: The suffix to be used when the version is dirty.
+    :return: the string containing preprocessor definitions
+    :type v: Version
+    :type prefix: str
+    :type dirty_suffix: str
+    """
     return ("#define {0}MAJOR {1}\n"
             "#define {0}MINOR {2}\n"
             "#define {0}PATCH {3}\n"
