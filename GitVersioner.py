@@ -31,9 +31,9 @@ class Version:
         if self.commits_since:
             s += '+' + str(self.commits_since)
         if self.hash:
-            s += '[' + self.hash + ']'
+            s += '.' + self.hash
         if self.is_dirty:
-            s += '-dirty'
+            s += '.dirty'
         return s
 
     @classmethod
