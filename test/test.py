@@ -41,6 +41,9 @@ class ParsingTestCase(unittest.TestCase):
         self.assertEqual(Version(1, 2, 0, is_dirty=True), Version.parse_from("v1.2-dirty"))
         self.assertEqual(Version(1, 2, 0, is_dirty=True), Version.parse_from("1.2-dirty"))
 
+    def test_invalid_tag(self):
+        self.assertRaises(ValueError, lambda: Version.parse_from("v1.2.3.1.1.1.1"))
+
     def test_commits_since(self):
         self.assertEqual(Version(1, 2, 0, None, "296cf8b", 12, False), Version.parse_from("v1.2.0-12-g296cf8b"))
         self.assertEqual(Version(1, 2, 0, None, "296cf8b", 12, True), Version.parse_from("v1.2.0-12-g296cf8b-dirty"))

@@ -66,6 +66,9 @@ class Version:
 
         tag = parts.pop(0).lstrip('v')
         version_codes = tag.split('.')
+        if len(version_codes) > 3:
+            raise ValueError("tag must be [v]major.minor.patch[-more_info], but is: {}".format(tag))
+
         major = int(version_codes[0])
         minor = int(version_codes[1])
         patch = int(version_codes[2]) if len(version_codes) == 3 else 0
