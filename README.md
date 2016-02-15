@@ -26,7 +26,39 @@ The resulting semantic version always follows this pattern:
 
 That means, the Major, Minor, and Patch parts will always be a pure numerical representation. Any additional information will be put in the Semantic Versioning string. 
 
-## Example
+## Usage
+
+    ./GitVersioner.py -h
+    usage: GitVersioner.py [-h] [-f FILE | -g [GIT_DIR]] [-d DIRTY_SUFFIX] [-m]
+                           [-p PREFIX]
+                           [version_string]
+
+    Splits a version string into individual components.
+
+    positional arguments:
+      version_string        Version string to parse. If omitted, the version will
+                            be read from stdin. Will be ignored if either -f or -g
+                            are given.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f FILE, --file FILE  Read version string from file. Only interprets the
+                            first line of the given file.
+      -g [GIT_DIR], --git-dir [GIT_DIR]
+                            Invoke `git describe` on optional directory. Default:
+                            current working directory
+      -d DIRTY_SUFFIX, --dirty-suffix DIRTY_SUFFIX
+                            Suffix to use when the build version is dirty.
+                            Default: 'dirty'
+
+    Macros:
+      C preprocessor options
+
+      -m, --macros          Output C preprocessor style macros
+      -p PREFIX, --prefix PREFIX
+                            Prefix to add before each preprocessor variable
+
+### Example
 
 #### Simple version
     GitVersioner.py v1.1
