@@ -24,7 +24,7 @@ The resulting semantic version always follows this pattern:
 - Any pre-release identifiers (separated from the version number by a '-')
 - Build metadata (commit count since last tag, commit hash, etc.), separated from previous string by '+'
 
-That means, the Major, Minor, and Patch parts will always be a pure numerical representation. Any additional information will be put in the Semantic Versioning string. 
+That means, the Major, Minor, and Patch parts will always be a pure numerical representation. Any additional information will be put in the Semantic Versioning string.
 
 ## Usage
 
