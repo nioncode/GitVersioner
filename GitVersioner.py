@@ -117,7 +117,7 @@ def read_version_from_git(git_dir):
     cwd = os.getcwd()
     os.chdir(git_dir)
     try:
-        return subprocess.check_output(["git", "describe", "--tags", "--always", "--dirty"]).decode()
+        return subprocess.check_output(["git", "describe", "--tags", "--always", "--dirty"]).decode().strip()
     finally:
         os.chdir(cwd)
 
