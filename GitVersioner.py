@@ -111,7 +111,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Splits a version string into individual components.")
     parser.add_argument('version_string', type=str, help='Version string to parse.')
     parser.add_argument('-d', '--dirty-suffix', type=str, default='dirty',
-                        help='Suffix to use when the build version is dirty')
+                        help='Suffix to use when the build version is dirty. Default: \'dirty\'')
     macros = parser.add_argument_group('Macros', 'C preprocessor options')
     macros.add_argument('-m', '--macros', action='store_true', help='Output C preprocessor style macros')
     macros.add_argument('-p', '--prefix', type=str, default='', help='Prefix to add before each preprocessor variable')
