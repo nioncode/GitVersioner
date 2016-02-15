@@ -1,6 +1,7 @@
 #!/bin/env python
 import argparse
 import re
+import sys
 
 
 class Version:
@@ -109,7 +110,8 @@ def version_as_preprocessor_macros(v, prefix, dirty_suffix):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Splits a version string into individual components.")
-    parser.add_argument('version_string', type=str, help='Version string to parse.')
+    parser.add_argument('version_string', type=str, nargs='?',
+                        help='Version string to parse. If omitted, the version will be read from stdin.')
     parser.add_argument('-d', '--dirty-suffix', type=str, default='dirty',
                         help='Suffix to use when the build version is dirty. Default: \'dirty\'')
     macros = parser.add_argument_group('Macros', 'C preprocessor options')
@@ -117,7 +119,12 @@ if __name__ == '__main__':
     macros.add_argument('-p', '--prefix', type=str, default='', help='Prefix to add before each preprocessor variable')
 
     args = parser.parse_args()
-    version = Version.parse_from(args.version_string)
+    version_string = args.version_string
+
+    if not version_string:
+        version_string = sys.stdin.readline().strip()
+
+    version = Version.parse_from(version_string)
     if args.macros:
         print(version_as_preprocessor_macros(version, args.prefix, args.dirty_suffix))
     else:
