@@ -1,6 +1,8 @@
 #!/bin/env python
 import argparse
+import os
 import re
+import subprocess
 import sys
 
 
@@ -108,10 +110,30 @@ def version_as_preprocessor_macros(v, prefix, dirty_suffix):
            ).format(prefix, v.major, v.minor, v.patch, v.semantic_version(dirty_suffix))
 
 
+def read_version_from_git(git_dir):
+    cwd = os.getcwd()
+    os.chdir(git_dir)
+    try:
+        return subprocess.check_output(["git", "describe", "--tags", "--always", "--dirty"])
+    finally:
+        os.chdir(cwd)
+
+
+def read_version_from_file(file_path):
+    with open(file_path, 'r') as f:
+            return f.readline().strip()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Splits a version string into individual components.")
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument('-f', '--file', type=str, help='Read version string from file. Only interprets the first '
+                                                          'line of the given file.')
+    selection.add_argument('-g', '--git-dir', type=str, nargs='?', const='.',
+                           help='Invoke `git describe` on optional directory. Default: current working directory')
     parser.add_argument('version_string', type=str, nargs='?',
-                        help='Version string to parse. If omitted, the version will be read from stdin.')
+                        help='Version string to parse. If omitted, the version will be read from stdin. Will be ignored'
+                             ' if either -f or -g are given.')
     parser.add_argument('-d', '--dirty-suffix', type=str, default='dirty',
                         help='Suffix to use when the build version is dirty. Default: \'dirty\'')
     macros = parser.add_argument_group('Macros', 'C preprocessor options')
@@ -121,7 +143,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     version_string = args.version_string
 
-    if not version_string:
+    if args.file:
+        version_string = read_version_from_file(args.file)
+    elif args.git_dir:
+        version_string = read_version_from_git(args.git_dir)
+    elif not version_string:
         version_string = sys.stdin.readline().strip()
 
     version = Version.parse_from(version_string)
